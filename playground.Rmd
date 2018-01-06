@@ -1,0 +1,103 @@
+---
+title: "Playground"
+author: "Mitchell Lisle"
+date: "06/01/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(highcharter)
+
+messiGoals <- read.csv("~/Documents/mlr/messi_vs_ronaldo/data/messiGoals.csv") %>% mutate(player = "Messi")
+ronaldoGoals <- read.csv("~/Documents/mlr/messi_vs_ronaldo/data/ronaldoGoals.csv") %>% filter(Year != '2002–03') %>% mutate(player = "Ronaldo")
+allGoals <- createAllGoals(messiGoals, ronaldoGoals)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+years <- ronaldoGoals$Year
+highchart() %>%
+  hc_xAxis(categories = years) %>%
+  hc_add_series(data = messiGoals$TotalGoals, type = "column", name = "Messi", color = "#535266") %>%
+  hc_add_series(data = ronaldoGoals$TotalGoals, type = "column", name = "Ronaldo", color = "#D8BB4F") %>%
+  hc_title(text = "Goal for Goal Comparison", align = "left") %>%
+  hc_subtitle(text = "The total number of goals scored by each player per season", align = "left") %>%
+  hc_credits(enabled = TRUE, text = "Source: Wikipedia")
+```
+
+
+
+```{r}
+
+
+highchart() %>%
+  hc_title(text = "Goals Per Game Winner", align = "left") %>%
+  hc_subtitle(text = "A comparison of the number of time one player ended a season with a higher goals per game average (All Competitions)", align = "left") %>%
+  hc_credits(enabled = TRUE, text = "Source: Wikipedia") %>%
+  hc_xAxis(categories = goalsPerGameMatch$winner) %>%
+  hc_add_series(goalsPerGameMatch$count, type = "bar", color = "#FFD082", name = "Season Wins")
+
+
+```
+```{r}
+highchart() %>%
+  hc_title(text = "Goals Per Season Winner", align = "left") %>%
+  hc_subtitle(text = "A comparison of the number of time one player ended a season with a higher goals tally (All Competitions)", align = "left") %>%
+  hc_credits(enabled = TRUE, text = "Source: Wikipedia") %>%
+  hc_xAxis(categories = totalGoalsMatch$winner) %>%
+  hc_add_series(totalGoalsMatch$count, type = "bar", color = "#FF5469", name = "Season Wins")
+  
+```
+
+```{r}
+highchart() %>%
+  hc_xAxis(categories = ronaldoGoals$Year) %>%
+  hc_add_series(data = messiGoals$TotalApps, type = "line", name = "Messi", color = "#00008C") %>%
+  hc_add_series(data = ronaldoGoals$TotalApps, type = "line", name = "Ronaldo", color = "#2FABC3") %>%
+  hc_title(text = "Appearances for Club and Country", align = "left") %>%
+  hc_subtitle(text = "The total number of appearances by each player per season", align = "left") %>%
+  hc_credits(enabled = TRUE, text = "Source: Wikipedia") %>%
+
+```
+```{r}
+messiGoals <- messiGoals %>%
+  mutate(goalsPerGames = TotalGoals/TotalApps)
+
+ronaldoGoals <- ronaldoGoals %>%
+  mutate(goalsPerGames = TotalGoals/TotalApps)
+
+highchart() %>%
+  hc_xAxis(categories = ronaldoGoals$Year) %>%
+  hc_add_series(data = messiGoals$goalsPerGames, name = "Messi", type = "area", color = "#65ACFF") %>%
+  hc_add_series(data = ronaldoGoals$goalsPerGames, name = "Ronaldo", type = "area", color = "#FF334C") %>%
+  hc_title(text = "Goals per Game", align = "left") %>%
+  hc_subtitle(text = "The average number of goals scored, per appearance by season", align = "left") %>%
+  hc_credits(enabled = TRUE, text = "Source: Wikipedia")
+
+# hc_add_series(data = ronaldoGoals$goalsPerGames, name = "Ronaldo", color = "#FF334C", marker = list(symbol = fa_icon_mark("futbol-o"))
+# 
+# dataForChart <- ronaldoGoals %>% 
+#   select(Year, TotalGoals) %>%
+#   group_by(Year) %>%
+#   mutate(list = list(seq(1, TotalGoals, by = 1)))
+# 
+# allGoals <- NULL
+#   for(i in 1:nrow(dataForChart)){
+#     player <- "ronaldo"
+#     goals <- dataForChart$list[[i]]
+#     year <- as.character(dataForChart$Year[i])
+#     currentYear <- data.frame(Year = year, Goals = goals, player = player)
+#     allGoals <- rbind(allGoals, currentYear)
+#   }
+# 
+# filter(allGoals, player == "ronaldo") %>%
+#   # hchart(hcaes(Year, Goals, color = player), type = "scatter", marker = list(symbol = fa_icon_mark("futbol-o")), icon = fa_icon("futbol-o"), name = "Goals") %>%
+#   hchart(hcaes(Year, Goals, color = player), type = "scatter", name = "Goals") %>%
+#   hc_chart(marker = list(symbol = fa_icon_mark("futbol-o"))) %>%
+#   hc_title(text = "Goal for Goal Comparison", align = "left") %>%
+#   hc_subtitle(text = "The total number of goals scored by each player per season", align = "left") %>%
+#   hc_credits(enabled = TRUE, text = "Source: Wikipedia")
+```
+
